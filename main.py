@@ -1,6 +1,8 @@
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 import datetime
+import pandas
+import os
 
 
 def years_with_correct_declension(years):
@@ -11,51 +13,31 @@ def years_with_correct_declension(years):
     return f"{years} лет"
 
 
+def get_fill_data_from_excel():
+    excel_data = pandas.read_excel('wine.xlsx',
+                                   sheet_name='Лист1',
+                                   na_values=['', 'nan'],
+                                   keep_default_na=True)
+    data_list = excel_data.to_dict(orient='records')
+    wines = []
+    for row in data_list:
+        wine = {
+            'image': os.path.join('images', row.get('Картинка', '')),
+            'name': row.get('Название', ''),
+            'sort': row.get('Сорт', ''),
+            'price': str(row.get('Цена', ''))
+        }
+        wines.append(wine)
+
+    return wines
+
+
 env = Environment(
     loader=FileSystemLoader('.'),
     autoescape=select_autoescape(['html', 'xml'])
 )
 
-wines = [
-    {
-        'image': 'images/izabella.png',
-        'name': 'Изабелла',
-        'sort': 'Изабелла',
-        'price': '350'
-    },
-    {
-        'image': 'images/granatovyi_braslet.png',
-        'name': 'Гранатовый браслет',
-        'sort': 'Мускат розовый',
-        'price': '350'
-    },
-    {
-        'image': 'images/shardone.png',
-        'name': 'Шардоне',
-        'sort': 'Шардоне',
-        'price': '350'
-    },
-    {
-        'image': 'images/belaya_ledi.png',
-        'name': 'Дамский пальчик',
-        'sort': 'Дамский пальчик',
-        'price': '399'
-    },
-    {
-        'image': 'images/rkaciteli.png',
-        'name': 'Ркацители',
-        'sort': 'Ркацители',
-        'price': '499'
-    },
-    {
-        'image': 'images/hvanchkara.png',
-        'name': 'Хванчкара',
-        'sort': 'Александраули',
-        'price': '550'
-    },
-
-]
-
+wines = get_fill_data_from_excel()
 
 year_count = datetime.datetime.now().year - 1920
 template = env.get_template('template.html')
