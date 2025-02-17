@@ -16,7 +16,7 @@ def years_with_correct_declension(years):
 
 
 def get_fill_data_from_excel():
-    excel_data = pandas.read_excel('wine2.xlsx',
+    excel_data = pandas.read_excel('wine3.xlsx',
                                    sheet_name='Лист1').fillna('')
     excel_list = excel_data.to_dict(orient='records')
     wine_list = collections.defaultdict(str)
@@ -26,6 +26,7 @@ def get_fill_data_from_excel():
             'name': row.get('Название', ''),
             'sort': row.get('Сорт', ''),
             'price': str(row.get('Цена', '')),
+            'promo': str(row.get('Акция', '')),
             'disabled_sort': True if row['Категория'] in DISABLED_SORT else False
         }
         wine_list.setdefault(row['Категория'], []).append(wine)
