@@ -7,6 +7,7 @@ import os
 
 DISABLED_SORT = ['Напитки']
 
+
 def years_with_correct_declension(years):
     if years % 10 == 1 and years % 100 != 11:
         return f"{years} год"
@@ -27,27 +28,33 @@ def get_fill_data_from_excel():
             'sort': row.get('Сорт', ''),
             'price': str(row.get('Цена', '')),
             'promo': str(row.get('Акция', '')),
-            'disabled_sort': True if row['Категория'] in DISABLED_SORT else False
+            'disabled_sort': True if row['Категория'] in DISABLED_SORT
+            else False
         }
         wine_list.setdefault(row['Категория'], []).append(wine)
     return wine_list
 
 
-env = Environment(
-    loader=FileSystemLoader('.'),
-    autoescape=select_autoescape(['html', 'xml'])
-)
+def main():
+    env = Environment(
+        loader=FileSystemLoader('.'),
+        autoescape=select_autoescape(['html', 'xml'])
+    )
 
-wine_list = get_fill_data_from_excel()
+    wine_list = get_fill_data_from_excel()
 
-year_count = datetime.datetime.now().year - 1920
-template = env.get_template('template.html')
+    year_count = datetime.datetime.now().year - 1920
+    template = env.get_template('template.html')
 
-rendered_page = template.render(
-    wine_list=wine_list, year=years_with_correct_declension(year_count))
+    rendered_page = template.render(
+        wine_list=wine_list, year=years_with_correct_declension(year_count))
 
-with open('index.html', 'w', encoding="utf8") as file:
-    file.write(rendered_page)
+    with open('index.html', 'w', encoding="utf8") as file:
+        file.write(rendered_page)
 
-server = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
-server.serve_forever()
+    server = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
+    server.serve_forever()
+
+
+if __name__ == '__main__':
+    main()
