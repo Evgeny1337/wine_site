@@ -5,6 +5,7 @@ import pandas
 import collections
 import os
 
+DISABLED_SORT = ['Напитки']
 
 def years_with_correct_declension(years):
     if years % 10 == 1 and years % 100 != 11:
@@ -24,7 +25,8 @@ def get_fill_data_from_excel():
             'image': os.path.join('images', row.get('Картинка', '')),
             'name': row.get('Название', ''),
             'sort': row.get('Сорт', ''),
-            'price': str(row.get('Цена', ''))
+            'price': str(row.get('Цена', '')),
+            'disabled_sort': True if row['Категория'] in DISABLED_SORT else False
         }
         wine_list.setdefault(row['Категория'], []).append(wine)
     return wine_list
