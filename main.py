@@ -5,6 +5,7 @@ import pandas
 import collections
 import os
 
+
 DISABLED_SORT = ['Напитки']
 
 
