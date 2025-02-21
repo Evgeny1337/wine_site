@@ -10,7 +10,7 @@ DISABLED_SORT = ['Напитки']
 FOUNDING_DATE = 1920
 
 
-def years_with_correct_declension(years):
+def get_years_with_correct_declension(years):
     if years % 10 == 1 and years % 100 != 11:
         return f"{years} год"
     elif 2 <= years % 10 <= 4 and not (12 <= years % 100 <= 14):
@@ -51,7 +51,7 @@ def main():
     template = env.get_template('template.html')
 
     rendered_page = template.render(
-        wine_list=wine_list, year=years_with_correct_declension(year_count))
+        wine_list=wine_list, year=get_years_with_correct_declension(year_count))
 
     with open('index.html', 'w', encoding="utf8") as file:
         file.write(rendered_page)
