@@ -4,9 +4,10 @@ import datetime
 import pandas
 import collections
 import os
-
+from dotenv import load_dotenv
 
 DISABLED_SORT = ['Напитки']
+FOUNDING_DATE = 1920
 
 
 def years_with_correct_declension(years):
@@ -17,12 +18,12 @@ def years_with_correct_declension(years):
     return f"{years} лет"
 
 
-def get_fill_data_from_excel():
-    excel_data = pandas.read_excel('wine3.xlsx',
+def get_fill_wines_data(wines_file):
+    excel_data = pandas.read_excel(wines_file,
                                    sheet_name='Лист1').fillna('')
-    excel_list = excel_data.to_dict(orient='records')
-    wine_list = collections.defaultdict(str)
-    for row in excel_list:
+    data = excel_data.to_dict(orient='records')
+    wines_data = collections.defaultdict(str)
+    for row in data:
         wine = {
             'image': os.path.join('images', row.get('Картинка', '')),
             'name': row.get('Название', ''),
@@ -32,19 +33,21 @@ def get_fill_data_from_excel():
             'disabled_sort': True if row['Категория'] in DISABLED_SORT
             else False
         }
-        wine_list.setdefault(row['Категория'], []).append(wine)
-    return wine_list
+        wines_data.setdefault(row['Категория'], []).append(wine)
+    return wines_data
 
 
 def main():
+    load_dotenv()
+    wines_file = os.environ['WINES_FILE']
     env = Environment(
         loader=FileSystemLoader('.'),
         autoescape=select_autoescape(['html', 'xml'])
     )
+    # Исправить wine_list
+    wine_list = get_fill_wines_data(wines_file)
 
-    wine_list = get_fill_data_from_excel()
-
-    year_count = datetime.datetime.now().year - 1920
+    year_count = datetime.datetime.now().year - FOUNDING_DATE
     template = env.get_template('template.html')
 
     rendered_page = template.render(
