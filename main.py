@@ -44,14 +44,16 @@ def main():
         loader=FileSystemLoader('.'),
         autoescape=select_autoescape(['html', 'xml'])
     )
-    # Исправить wine_list
-    wine_list = get_fill_wines_data(wines_file)
+
+    wines_collection = get_fill_wines_data(wines_file)
 
     year_count = datetime.datetime.now().year - FOUNDING_DATE
     template = env.get_template('template.html')
 
     rendered_page = template.render(
-        wine_list=wine_list, year=get_years_with_correct_declension(year_count))
+        wines_collection=wines_collection,
+        year=get_years_with_correct_declension(year_count)
+    )
 
     with open('index.html', 'w', encoding="utf8") as file:
         file.write(rendered_page)
