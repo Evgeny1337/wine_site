@@ -18,12 +18,12 @@ def get_years_with_correct_declension(years):
     return f"{years} лет"
 
 
-def get_fill_wines_data(wines_file):
-    excel_data = pandas.read_excel(wines_file,
-                                   sheet_name='Лист1').fillna('')
-    data = excel_data.to_dict(orient='records')
-    wines_data = collections.defaultdict(str)
-    for row in data:
+def get_wine_data(wines_file):
+    wine_data_df = pandas.read_excel(wines_file,
+                                     sheet_name='Лист1').fillna('')
+    wine_records = wine_data_df.to_dict(orient='records')
+    wine_info = collections.defaultdict(str)
+    for row in wine_records:
         wine = {
             'image': os.path.join('images', row.get('Картинка', '')),
             'name': row.get('Название', ''),
@@ -33,8 +33,8 @@ def get_fill_wines_data(wines_file):
             'disabled_sort': True if row['Категория'] in DISABLED_SORT
             else False
         }
-        wines_data.setdefault(row['Категория'], []).append(wine)
-    return wines_data
+        wine_info.setdefault(row['Категория'], []).append(wine)
+    return wine_info
 
 
 def main():
@@ -45,7 +45,7 @@ def main():
         autoescape=select_autoescape(['html', 'xml'])
     )
 
-    wines_collection = get_fill_wines_data(wines_file)
+    wines_collection = get_wine_data(wines_file)
 
     year_count = datetime.datetime.now().year - FOUNDING_DATE
     template = env.get_template('template.html')
